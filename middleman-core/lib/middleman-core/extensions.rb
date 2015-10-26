@@ -23,7 +23,7 @@ module Middleman
         # If we've already got a matching extension that passed the
         # version check, bail out.
         return if registered.key?(name.to_sym) &&
-        !registered[name.to_sym].is_a?(String)
+                  !registered[name.to_sym].is_a?(String)
 
         registered[name.to_sym] = if block_given?
           block
@@ -56,8 +56,6 @@ module Middleman
     #
     # @private
     def load_extensions_in_path
-      require 'rubygems'
-
       extensions = rubygems_latest_specs.select do |spec|
         spec_has_file?(spec, EXTENSION_FILE)
       end

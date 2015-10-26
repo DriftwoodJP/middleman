@@ -8,10 +8,6 @@ require 'i18n'
 # users expect.
 ::I18n.enforce_available_locales = false
 
-# Use ActiveSupport JSON
-require 'active_support/json'
-require 'active_support/core_ext/integer/inflections'
-
 # Simple callback library
 require 'hooks'
 
@@ -57,7 +53,9 @@ module Middleman
     # Root project directory (overwritten in middleman build/server)
     # @return [String]
     def self.root
-      ENV['MM_ROOT'] || Dir.pwd
+      r = ENV['MM_ROOT'] ? ENV['MM_ROOT'].dup : ::Middleman::Util.current_directory
+      r.encode!('UTF-8', 'UTF-8-MAC') if RUBY_PLATFORM =~ /darwin/
+      r
     end
     delegate :root, to: :"self.class"
 
@@ -66,6 +64,30 @@ module Middleman
       Pathname(root)
     end
     delegate :root_path, to: :"self.class"
+
+    # Which port preview should start on.
+    # @return [Fixnum]
+    config.define_setting :port, 4567, 'The preview server port'
+
+    # Which server name should be used
+    # @return [NilClass, String]
+    config.define_setting :server_name, nil, 'The server name of preview server'
+
+    # Which bind address the preview server should use
+    # @return [NilClass, String]
+    config.define_setting :bind_address, nil, 'The bind address of the preview server'
+
+    # Whether to serve the preview server over HTTPS.
+    # @return [Boolean]
+    config.define_setting :https, false, 'Serve the preview server over SSL/TLS'
+
+    # The (optional) path to the SSL cert to use for the preview server.
+    # @return [String]
+    config.define_setting :ssl_certificate, nil, 'Path to an X.509 certificate to use for the preview server'
+
+    # The (optional) private key for the certificate in :ssl_certificate.
+    # @return [String]
+    config.define_setting :ssl_private_key, nil, "Path to an RSA private key for the preview server's certificate"
 
     # Name of the source directory
     # @return [String]

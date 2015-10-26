@@ -142,7 +142,9 @@ module Middleman::Cli
         base.remove_file f, force: true
       end
 
-      Dir[@build_dir.join('**', '*')].select { |d| File.directory?(d) }.each do |d|
+      ::Middleman::Util.glob_directory(@build_dir.join('**', '*'))
+        .select { |d| File.directory?(d) }
+        .each do |d|
         base.remove_file d, force: true if directory_empty? d
       end
     end
@@ -169,7 +171,7 @@ module Middleman::Cli
       paths = ::Middleman::Util.all_files_under(@build_dir).map(&:realpath).select(&:file?)
 
       @to_clean += paths.select do |path|
-        path.to_s !~ /\/\./ || path.to_s =~ /\.(htaccess|htpasswd)/
+        path.relative_path_from(@build_dir.realpath).to_s !~ /\/\./ || path.to_s =~ /\.(htaccess|htpasswd)/
       end
 
       return unless RUBY_PLATFORM =~ /darwin/
@@ -182,7 +184,7 @@ module Middleman::Cli
     # @return [void]
     def execute!
       # Sort order, images, fonts, js/css and finally everything else.
-      sort_order = %w(.png .jpeg .jpg .gif .bmp .svg .svgz .ico .webp .woff .otf .ttf .eot .js .css)
+      sort_order = %w(.png .jpeg .jpg .gif .bmp .svg .svgz .ico .webp .woff .woff2 .otf .ttf .eot .js .css)
 
       # Pre-request CSS to give Compass a chance to build sprites
       logger.debug '== Prerendering CSS'

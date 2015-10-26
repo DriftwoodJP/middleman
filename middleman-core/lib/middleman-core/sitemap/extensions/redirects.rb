@@ -66,9 +66,11 @@ module Middleman
             super(store, path)
           end
 
+          # rubocop:disable Style/AccessorMethodName
           def get_source_file
             nil
           end
+          # rubocop:enable Style/AccessorMethodName
 
           def template?
             true
@@ -78,7 +80,7 @@ module Middleman
             url = ::Middleman::Util.url_for(store.app, @request_path,
                                             relative: false,
                                             find_resource: true
-            )
+                                           )
 
             if output
               output.call(path, url)
@@ -86,6 +88,7 @@ module Middleman
               <<-END
                 <html>
                   <head>
+                    <link rel="canonical" href="#{url}" />
                     <meta http-equiv=refresh content="0; url=#{url}" />
                     <meta name="robots" content="noindex,follow" />
                     <meta http-equiv="cache-control" content="no-cache" />
